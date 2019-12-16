@@ -8,17 +8,17 @@ def humanize_time(secs):
 
 
 
-FimT=7070 #duração em segundos para 1:57:50 
+FimT=220 #duração em segundos para 00:3:40 
 intervaloT=2  
-startT=2400
+startT=0
 endT=startT + intervaloT
 
 count = 0
 
-while (endT<=2460):
+while (endT<=FimT):
 	num =  ("{:0>5}".format(count))
-	fileOut = "HomemFormiga_" + num + ".mkv" 	
-	comando = "ffmpeg -v quiet -y -i Homem_Formiga.mkv -vcodec copy -acodec copy -ss " + humanize_time(startT) + " -t " + humanize_time(intervaloT) + " -sn " + fileOut
+	fileOut = "longboard" + num + ".mkv" 	
+	comando = "ffmpeg -v quiet -y -i longboard-downhill.mkv -vcodec copy -acodec copy -ss " + humanize_time(startT) + " -t " + humanize_time(intervaloT) + " -sn " + fileOut
 	print (comando)
 	os.system(comando)
 	count= count + 1

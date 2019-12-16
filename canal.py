@@ -82,7 +82,7 @@ class CanalThread(threading.Thread):
         with sk.socket(sk.AF_INET, sk.SOCK_STREAM) as sk_client:
             sk_client.connect((cliente,  PORTA_SAIDA))
 
-            nome_arq = self.path + "{}_{}.mkv".format(self.nome_base, format(self.curr_file, '05d'))
+            nome_arq = self.path + "{}_{}.wmv".format(self.nome_base, format(self.curr_file, '05d'))
 
             # Envia o arquivo
             with open(nome_arq, 'rb') as up_file:
