@@ -1,15 +1,15 @@
-from client import ClientReceiver
-from client import ServerReceiver
+from client import ClientConnect
+from client import ServerConnect
 class Client:
 	def __init__(self, max_connections):
 		
 		self.sender_ip = None
 
-		self.clientReceiver = ClientReceiver(self)
-		self.clientReceiver.daemon = True
+		self.ClientConnect = ClientConnect(self)
+		self.ClientConnect.daemon = True
 
-		self.serverReceiver = ServerReceiver(self)
-		self.serverReceiver.daemon = True
+		self.ServerConnect = ServerConnect(self)
+		self.ServerConnect.daemon = True
 
 		self.clientServer = ClientServer(self, "./")
 		self.clientServer.daemon = True

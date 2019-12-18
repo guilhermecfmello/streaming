@@ -17,11 +17,11 @@ class Client:
 
 		self.sender_ip = None
 
-		self.clientReceiver = ClientReceiver(self)
-		self.clientReceiver.daemon = True
+		self.ClientConnect = ClientConnect(self)
+		self.ClientConnect.daemon = True
 
-		self.serverReceiver = ServerReceiver(self)
-		self.serverReceiver.daemon = True
+		self.ServerConnect = ServerConnect(self)
+		self.ServerConnect.daemon = True
 
 		self.clientServer = ClientServer(self, "./")
 		self.clientServer.daemon = True
@@ -41,7 +41,7 @@ class Client:
 		return self.currentVideo
 
 # Receive data from server
-class ServerReceiver(threading.Thread):
+class ServerConnect(threading.Thread):
 	def __init__(self, client):
 		threading.Thread.__init__(self)
 		self.client = client
@@ -123,7 +123,7 @@ class ServerReceiver(threading.Thread):
 		self._stopped = True
 
 #Receive data from another client
-class ClientReceiver(threading.Thread):
+class ClientConnect(threading.Thread):
 	def __init__(self, client):
 		threading.Thread.__init__(self)
 		self.client = client
@@ -153,11 +153,11 @@ class ClientReceiver(threading.Thread):
 					_thread.interrupt_main()
 					# self.client.clientServer.stop()
 
-					if self.client.clientReceiver.is_alive():
-						self.client.clientReceiver.stop()
+					if self.client.ClientConnect.is_alive():
+						self.client.ClientConnect.stop()
 
-					if self.client.serverReceiver.is_alive():
-						self.client.serverReceiver.stop()
+					if self.client.ServerConnect.is_alive():
+						self.client.ServerConnect.stop()
 					print("Problemas com o Servidor {}: {}".format(self.client.sender_ip, e))
 
 					client2 = Client(self.client.maxConnections)
@@ -270,10 +270,10 @@ dest = (TCP_HOST, TCP_PORT)
 msg = None
 
 client = Client(qtd_max)
-serverReceiver = ServerReceiver(client)
-clientReceiver = ClientReceiver(client)
+ServerConnect = ServerConnect(client)
+ClientConnect = ClientConnect(client)
 
-serverReceiver.daemon = True
+ServerConnect.daemon = True
 
 def conecta(TCP_HOST, TCP_PORT, BUFFER_SIZE, dest, msg, client):
 	while True:
@@ -287,8 +287,8 @@ def conecta(TCP_HOST, TCP_PORT, BUFFER_SIZE, dest, msg, client):
 
 			# Sair do canal
 			if msg[0:2] == '12':
-				client.serverReceiver.stop()
-				client.serverReceiver.join()
+				client.ServerConnect.stop()
+				client.ServerConnect.join()
 				# client = Client()
 
 				# recep.stop()
@@ -362,7 +362,7 @@ def conecta(TCP_HOST, TCP_PORT, BUFFER_SIZE, dest, msg, client):
 						tcp2.close()
 
 					client.set_sender_ip(client_ip)
-					client.clientReceiver.start()
+					client.ClientConnect.start()
 
 					# clientServer = ClientServer(client, "./")
 					client.clientServer.start()
@@ -395,9 +395,9 @@ def conecta(TCP_HOST, TCP_PORT, BUFFER_SIZE, dest, msg, client):
 							else:
 								print("Comando Invalido!")
 
-				elif not serverReceiver.is_alive():
+				elif not ServerConnect.is_alive():
 					client.set_sender_ip(TCP_HOST)
-					client.serverReceiver.start()
+					client.ServerConnect.start()
 
 					print("##### AAA #####")
 
@@ -486,7 +486,7 @@ def connect(dest, msg, client):
 				tcp2.close()
 
 			client.set_sender_ip(client_ip)
-			client.clientReceiver.start()
+			client.ClientConnect.start()
 
 			# clientServer = ClientServer(client, "./")
 			client.clientServer.start()
@@ -520,9 +520,9 @@ def connect(dest, msg, client):
 					else:
 						print("Comando Invalido!")
 
-		elif not client.serverReceiver.is_alive():
+		elif not client.ServerConnect.is_alive():
 			client.set_sender_ip(TCP_HOST)
-			client.serverReceiver.start()
+			client.ServerConnect.start()
 
 			# clientServer = ClientServer(client, "./")
 			# clientServer.daemon = True
@@ -539,8 +539,8 @@ def connect(dest, msg, client):
 
 			# Sair do canal
 			if msg[0:2] == '12':
-				client.serverReceiver.stop()
-				client.serverReceiver.join()
+				client.ServerConnect.stop()
+				client.ServerConnect.join()
 				# client = Client()
 
 				# recep.stop()
@@ -612,7 +612,7 @@ def connect(dest, msg, client):
 						tcp2.close()
 
 					client.set_sender_ip(client_ip)
-					client.clientReceiver.start()
+					client.ClientConnect.start()
 
 					# clientServer = ClientServer(client, "./")
 					client.clientServer.start()
@@ -645,10 +645,10 @@ def connect(dest, msg, client):
 							else:
 								print("Comando Invalido!")
 
-				elif not serverReceiver.is_alive():
+				elif not ServerConnect.is_alive():
 					print("AAAAAAAABBBBBBBBBBBBBBBB")
 					client.set_sender_ip(TCP_HOST)
-					client.serverReceiver.start()
+					client.ServerConnect.start()
 
 					# clientServer = ClientServer(client, "./")
 					# clientServer.daemon = True
