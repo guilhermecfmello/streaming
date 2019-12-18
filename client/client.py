@@ -55,7 +55,7 @@ class ServerConnect(threading.Thread):
 
 			sk_server.bind(('', 9091))
 			sk_server.listen(1)
-			sk_server.settimeout(3)
+			sk_server.settimeout(10)
 
 			print("SERVER RECEIVER STARTED")
 
@@ -126,7 +126,7 @@ class ClientConnect(threading.Thread):
 
 			sk_server.bind(('', 9092))
 			sk_server.listen(1)
-			sk_server.settimeout(3)
+			sk_server.settimeout(10)
 
 			print("Client receiver started")
 
@@ -148,8 +148,8 @@ class ClientConnect(threading.Thread):
 
 					client2 = Client(self.client.maxConnections)
 					dest2 = (TCP_HOST, TCP_PORT)
-					# connect(dest2, "100", client2)
-					conecta(TCP_HOST, TCP_PORT, BUFFER_SIZE, dest, msg, client)
+					connect(dest2, "100", client2)
+					# conecta(TCP_HOST, TCP_PORT, BUFFER_SIZE, dest, msg, client)
 					sys.exit()
 
 				nome = "{}.wmv".format(file_num)
