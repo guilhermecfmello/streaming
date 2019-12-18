@@ -55,7 +55,7 @@ class ServerConnect(threading.Thread):
 
 			sk_server.bind(('', 9091))
 			sk_server.listen(1)
-			sk_server.settimeout(10)
+			sk_server.settimeout(3)
 
 			print("SERVER RECEIVER STARTED")
 
@@ -126,7 +126,7 @@ class ClientConnect(threading.Thread):
 
 			sk_server.bind(('', 9092))
 			sk_server.listen(1)
-			sk_server.settimeout(10)
+			sk_server.settimeout(3)
 
 			print("Client receiver started")
 
@@ -149,7 +149,6 @@ class ClientConnect(threading.Thread):
 					client2 = Client(self.client.maxConnections)
 					dest2 = (TCP_HOST, TCP_PORT)
 					connect(dest2, "100", client2)
-					# conecta(TCP_HOST, TCP_PORT, BUFFER_SIZE, dest, msg, client)
 					sys.exit()
 
 				nome = "{}.wmv".format(file_num)
@@ -215,7 +214,6 @@ class ExibeVideos(threading.Thread):
 				nomeMovie = self.client.currentVideo
 				Player.play(self, nomeMovie)
 				time.sleep(3.9)
-			
 
 	def stop(self):
 		self.client.currentVideo = None
@@ -270,9 +268,13 @@ def conecta(TCP_HOST, TCP_PORT, BUFFER_SIZE, dest, msg, client):
 					message = str(received_msg, 'utf-8')
 
 					print("RECEIVED MESSAGE: " + message)
-				# Erro ao entrar no canal, deve-se conectar a cliente
+
 				if message == "00":
+					# AQUI É ONDE O CLIENTE PROCURA OUTRO CLIENTE PARA RECEBER OS ARQUIVOS
 					print("Limite de canais conectados ao servidor excedidos.")
+
+					# print("Digite o ip para se conectar a outro cliente: ")
+					# client_ip = input()
 
 					with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp2:
 						tcp2.connect((TCP_HOST, 6060))
@@ -325,7 +327,18 @@ def conecta(TCP_HOST, TCP_PORT, BUFFER_SIZE, dest, msg, client):
 							tcp2.connect((client_ip, 9093))
 							tcp2.send(bytes(code, encoding='utf-8'))
 
-							if code == "11":
+							if code == "123":
+								print("IP do cliente emissor: {} \n\n".format(client.sender_ip))
+								print("IPs do(s) cliente(s) que recebem dados deste cliente em analise:")
+
+								if len(client.clients) > 0:
+									for client_receiver in client.clients:
+										print(client_receiver + "\n")
+
+								else:
+									print("Nenhum cliente conectado a este")
+
+							elif code == "11":
 								print(str(tcp2.recv(BUFFER_SIZE), 'utf-8'))
 
 							else:
@@ -366,6 +379,7 @@ def connect(dest, msg, client):
 			tcp2.listen(1)
 
 			content, address = tcp2.accept()
+			print("AAAAAAAAAAAAAAAAAAAAAAAAAAa")
 
 			received_msg = content.recv(BUFFER_SIZE)
 			message = str(received_msg, 'utf-8')
@@ -383,15 +397,17 @@ def connect(dest, msg, client):
 				clients_ip = handle_ip_list(clients_ip)
 
 			client_ip = None
+			# client_ip = str(client_ip)
 			socketserver.TCPServer.allow_reuse_address = True
 			for ip in clients_ip:
 				with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp3:
-					print("Request connection from: ", ip)
+					print("IP TENTANDO CONECTAR: ", ip)
 					tcp3.connect((ip, 9093))
 					tcp3.send(bytes("10", encoding='utf-8'))
 					resp = str(tcp3.recv(BUFFER_SIZE), 'utf-8')
-
+					# print("RESPOSTA: ", resp)
 					if resp == "OK":
+						print("DEU BOM!")
 						client_ip = ip
 						break
 
@@ -470,6 +486,8 @@ def connect(dest, msg, client):
 					# AQUI É ONDE O CLIENTE PROCURA OUTRO CLIENTE PARA RECEBER OS ARQUIVOS
 					print("Limite de canais conectados ao servidor excedidos.")
 
+					# print("Digite o ip para se conectar a outro cliente: ")
+					# client_ip = input()
 
 					with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp2:
 						tcp2.connect((TCP_HOST, 6060))
@@ -480,24 +498,31 @@ def connect(dest, msg, client):
 						clients_ip = handle_ip_list(clients_ip)
 
 					client_ip = None
+					# client_ip = str(client_ip)
 					socketserver.TCPServer.allow_reuse_address = True
 					for ip in clients_ip:
 						with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp3:
-							print("Request connection from: ", ip)
+							print("IP TENTANDO CONECTAR: ", ip)
 							tcp3.connect((ip, 9093))
 							tcp3.send(bytes("10", encoding='utf-8'))
 							resp = str(tcp3.recv(BUFFER_SIZE), 'utf-8')
+							# print("RESPOSTA: ", resp)
 							if resp == "OK":
+								print("DEU BOM!")
 								client_ip = ip
 								break
+
 							tcp3.close()
 
 					if client_ip is None:
 						client_ip = get_available_client(clients_ip)
 
+					# return
+
 					socketserver.TCPServer.allow_reuse_address = True
 					with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp2:
-						print("CLIENT: ", client_ip)
+						print("CLIENTE IP: ", client_ip)
+						# destiny = (client_ip, 9092)
 						tcp2.connect((client_ip, 9095))
 						tcp2.sendall(bytes("teste", encoding='utf-8'))
 						tcp2.close()
@@ -505,7 +530,10 @@ def connect(dest, msg, client):
 					client.set_sender_ip(client_ip)
 					client.ClientConnect.start()
 
+					# clientServer = ClientServer(client, "./")
 					client.clientServer.start()
+					# x = ExibeVideos(client)
+					# x.start()
 
 					while True:
 						code = input()
@@ -514,7 +542,19 @@ def connect(dest, msg, client):
 						with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp2:
 							tcp2.connect((client_ip, 9093))
 							tcp2.send(bytes(code, encoding='utf-8'))
-							if code == "11":
+
+							if code == "123":
+								print("IP do cliente emissor: {} \n\n".format(client.sender_ip))
+								print("IPs do(s) cliente(s) que recebem dados deste cliente em analise:")
+
+								if len(client.clients) > 0:
+									for client_receiver in client.clients:
+										print(client_receiver + "\n")
+
+								else:
+									print("Nenhum cliente conectado a este")
+
+							elif code == "11":
 								print(str(tcp2.recv(BUFFER_SIZE), 'utf-8'))
 
 							else:
@@ -527,11 +567,11 @@ def connect(dest, msg, client):
 
 					client.clientServer.start()
 
-			# Lista de clientes conectados
+			# lista de clientes conectados
 			if msg[0:2] == '11':
 				print(str(tcp.recv(BUFFER_SIZE), 'utf-8'))
 
-			# Quantidade de clientes conectados
+			# quantidade de clientes conectados
 			if msg[0:2] == '13':
 				print(str(tcp.recv(BUFFER_SIZE), 'utf-8'))
 
@@ -558,7 +598,9 @@ def handle_ip_list(ip_list):
 def get_available_client(clients_ip):
 	normal = None
 	for ip in clients_ip:
+		print("IP:", ip)
 		if is_available(ip):
+			print("VAMO PORRA")
 			normal = ip
 			break
 
@@ -566,8 +608,10 @@ def get_available_client(clients_ip):
 		return normal
 
 	for ip in clients_ip:
+		# print("AAAAAAAAAAAAAAaa")
 		clients_list = get_clients_list(ip)
 		normal = get_available_client(clients_list)
+
 		if normal is not None:
 			return normal
 
@@ -594,5 +638,4 @@ def get_clients_list(ip):
 	return clients_list
 
 conecta(TCP_HOST, TCP_PORT, BUFFER_SIZE, dest, msg, client)
-# connect(dest, msg, client)
 
