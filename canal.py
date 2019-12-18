@@ -3,11 +3,11 @@ import socket as sk
 import time
 from os import listdir
 
-WAIT_TIME   = 1.8
+WAIT_TIME   = 3.8
 BUFFER_SIZE = 1024
 PORTA_SAIDA = 9091
 
-MAX_CLIENTES_CANAL = 3
+MAX_CLIENTES_CANAL = 1
 
 class CanalThread(threading.Thread):
     def __init__(self, canal_id, path):

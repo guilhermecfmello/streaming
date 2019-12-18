@@ -10,13 +10,11 @@ import time
 from threading import Lock
 from canalTeste import *
 
-# lock = Lock()
+
 
 class Client:
 	def __init__(self, max_connections):
-		# self.serverReceiver = None
-		# self.clientReceiver = None
-		# self.clientServer = None
+
 		self.sender_ip = None
 
 		self.clientReceiver = ClientReceiver(self)
@@ -72,12 +70,8 @@ class ServerReceiver(threading.Thread):
 					content, address = sk_server.accept()
 
 				except socket.timeout as e:
-					print("Problemas com o Servidor {}: {}".format(self.client.sender_ip, e))
-					# print("Clientes:", self.client.sender_ip)
-					# self.stop()
-					# _thread.interrupt_main()
+					print("Error on server, ip: {} error: {}".format(self.client.sender_ip, e))
 					sys.exit()
-					# break
 
 				# Recebe o nome do arquivo
 				nome = "{}.wmv".format(file_num)
@@ -266,7 +260,7 @@ class ExibeVideos(threading.Thread):
 
 
 # IP e porta do servidor
-TCP_HOST = '127.0.0.1'  # IP
+TCP_HOST = '191.52.64.92'  # IP
 TCP_PORT = 6060  # porta
 BUFFER_SIZE = 1024  # Normally 1024
 qtd_max = int(input("Digite a quantidade de Usuários que poderão se conectar: "))
